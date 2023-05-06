@@ -200,7 +200,7 @@ namespace DevourDev.Unity.TwoDThreeD
                 viewsSettings[i] = new TwoDThreeDComponent.RelativeView(viewSr.gameObject, dirTr);
             }
 
-            tdtd.InitInternal(billBoardSettings, viewsSettings);
+            tdtd.InitInternal(billBoardSettings, viewsSettings, transform.root);
 
             // Probably overkill due to SetDirty(transform.root) in OnValidate().
             UnityEditor.EditorUtility.SetDirty(tdtd);
@@ -342,7 +342,7 @@ namespace DevourDev.Unity.TwoDThreeD
         }
 #endif
 
-        private void Awake()
+        private void Start()
         {
             Destroy(this);
         }

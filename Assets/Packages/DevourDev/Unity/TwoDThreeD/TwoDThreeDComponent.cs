@@ -70,20 +70,23 @@ namespace DevourDev.Unity.TwoDThreeD
 
         [SerializeField] private BillBoardSettings _billBoardSettings;
         [SerializeField] private RelativeView[] _viewsSettings;
+        [SerializeField] private Transform _rootTr;
 
         private GameObject _activeViewGo;
         private Transform _activeViewTr;
 
         private Quaternion _camRot;
+        private Quaternion _prevRootRot;
         private bool _isDirty;
 
         internal int _index = -1;
 
 
-        internal void InitInternal(BillBoardSettings billBoardSettings, RelativeView[] viewsSettings)
+        internal void InitInternal(BillBoardSettings billBoardSettings, RelativeView[] viewsSettings, Transform rootTransform)
         {
             _billBoardSettings = billBoardSettings;
             _viewsSettings = viewsSettings;
+            _rootTr = rootTransform;
 
             if (UnityEngine.Application.isPlaying)
             {
@@ -113,12 +116,26 @@ namespace DevourDev.Unity.TwoDThreeD
 
         private void Update()
         {
-            AdjustBillboard();
-
             if (_isDirty)
-                UpdateRelativeView();
+            {
+                if (ShouldAdjust())
+                {
+                    AdjustAll();
+                }
+            }
 
             _isDirty = true;
+        }
+
+        private bool ShouldAdjust()
+        {
+            var rootRot = _rootTr.localRotation;
+
+            if (rootRot == _prevRootRot)
+                return false;
+
+            _prevRootRot = rootRot;
+            return true;
         }
 
         private void OnDestroy()
@@ -130,10 +147,15 @@ namespace DevourDev.Unity.TwoDThreeD
         internal void OnCameraRotChanged(Quaternion rot)
         {
             _camRot = rot;
-            UpdateRelativeView();
-            _isDirty = false;
+            AdjustAll();
         }
 
+        private void AdjustAll()
+        {
+            UpdateRelativeView();
+            AdjustBillboard();
+            _isDirty = false;
+        }
 
         private void PrewarmViews()
         {
@@ -146,7 +168,12 @@ namespace DevourDev.Unity.TwoDThreeD
                 _viewsSettings[i].Visual.SetActive(false);
             }
 
-            SetActiveView(_viewsSettings[0].Visual);
+            if (_viewsSettings.Length > 1)
+                UpdateRelativeView();
+            else
+                SetActiveView(_viewsSettings[0].Visual);
+
+            _isDirty = false;
         }
 
         private void SetActiveView(GameObject go)
@@ -154,7 +181,7 @@ namespace DevourDev.Unity.TwoDThreeD
             if (_activeViewGo != null)
                 _activeViewGo.SetActive(false);
 
-            if(go == null)
+            if (go == null)
             {
                 _activeViewGo = null;
                 _activeViewTr = null;
@@ -200,14 +227,14 @@ namespace DevourDev.Unity.TwoDThreeD
                 //    closestView = sv;
                 //}
 
-                if(angle > maxAngle)
+                if (angle > maxAngle)
                 {
                     maxAngle = angle;
                     closestView = sv;
                 }
             }
 
-            if (closestView.Visual.GetHashCode() == _activeViewGo.GetHashCode())
+            if (_activeViewGo != null && closestView.Visual.GetHashCode() == _activeViewGo.GetHashCode())
                 return;
 
             SetActiveView(closestView.Visual);
