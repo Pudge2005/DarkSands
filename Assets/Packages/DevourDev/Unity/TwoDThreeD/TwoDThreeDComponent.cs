@@ -1,31 +1,80 @@
 using System;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace DevourDev.Unity.TwoDThreeD
 {
+    public interface IAnimator
+    {
+        void SetFloat(int hash, float value);
+        void SetInt(int hash, int value);
+        void SetBool(int hash, bool value);
+        void SetTrigger(int hash);
+
+        float GetFloat(int hash);
+        int GetInt(int hash);
+        bool GetBool(int hash);
+    }
+
+    public static class AnimationHelpers
+    {
+        public static void SyncAnimators(Animator from, Animator to)
+        {
+            //Animation animation = null;
+            //animation.
+            int paramsCount = from.parameterCount;
+
+            for (int i = 0; i < paramsCount; i++)
+            {
+                var animParam = from.GetParameter(i);
+                SyncAnimParam(ref from, ref to, ref animParam);
+            }
+
+            var state = from.GetCurrentAnimatorStateInfo(0);
+            to.Play(state.fullPathHash, 0, state.normalizedTime);
+        }
+
+        private static void SyncAnimParam(ref Animator from, ref Animator to,
+                                   ref AnimatorControllerParameter animParam)
+        {
+            var hash = animParam.nameHash;
+            switch (animParam.type)
+            {
+                case AnimatorControllerParameterType.Float:
+                    to.SetFloat(hash, from.GetFloat(hash));
+                    break;
+                case AnimatorControllerParameterType.Int:
+                    to.SetInteger(hash, from.GetInteger(hash));
+                    break;
+                case AnimatorControllerParameterType.Bool:
+                    to.SetBool(hash, from.GetBool(hash));
+                    break;
+                case AnimatorControllerParameterType.Trigger:
+                    //to.SetTrigger(hash);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
     [DefaultExecutionOrder(TwoDThreeDManager.ExecutionOrder + 1)]
     public sealed class TwoDThreeDComponent : MonoBehaviour
     {
         [System.Serializable]
-        internal readonly struct BillBoardSettings
+        internal struct BillBoardSettings
         {
-            private readonly bool _lockXRot;
-            private readonly bool _lockYRot;
-            private readonly bool _lockZRot;
+            public bool LockXRot;
+            public bool LockYRot;
+            public bool LockZRot;
 
 
             public BillBoardSettings(bool lockXRot, bool lockYRot, bool lockZRot)
             {
-                _lockXRot = lockXRot;
-                _lockYRot = lockYRot;
-                _lockZRot = lockZRot;
+                LockXRot = lockXRot;
+                LockYRot = lockYRot;
+                LockZRot = lockZRot;
             }
-
-
-            public bool LockXRot => _lockXRot;
-            public bool LockYRot => _lockYRot;
-            public bool LockZRot => _lockZRot;
 
 
             public Quaternion MergeRotations(Quaternion origRot, Quaternion targetRot)
@@ -35,13 +84,13 @@ namespace DevourDev.Unity.TwoDThreeD
 
             public Vector3 MergeRotations(Vector3 origEulers, Vector3 targetEulers)
             {
-                if (!_lockXRot)
+                if (!LockXRot)
                     origEulers.x = targetEulers.x;
 
-                if (!_lockYRot)
+                if (!LockYRot)
                     origEulers.y = targetEulers.y;
 
-                if (!_lockZRot)
+                if (!LockZRot)
                     origEulers.z = targetEulers.z;
 
                 return origEulers;
@@ -49,31 +98,11 @@ namespace DevourDev.Unity.TwoDThreeD
         }
 
 
-        [System.Serializable]
-        internal sealed class RelativeView
-        {
-            [SerializeField] GameObject _visual;
-            [SerializeField] Transform _lookFromDirection;
-
-
-            public RelativeView(GameObject visual, Transform lookFromDirection)
-            {
-                _visual = visual;
-                _lookFromDirection = lookFromDirection;
-            }
-
-
-            public GameObject Visual => _visual;
-            public Transform Direction => _lookFromDirection;
-        }
-
-
+        [SerializeField] private LinkedAnimator _linkedAnimator;
         [SerializeField] private BillBoardSettings _billBoardSettings;
-        [SerializeField] private RelativeView[] _viewsSettings;
+        [SerializeField] private TwoDThreeDView[] _viewsSettings;
         [SerializeField] private Transform _rootTr;
 
-        private GameObject _activeViewGo;
-        private Transform _activeViewTr;
 
         private Quaternion _camRot;
         private Quaternion _prevRootRot;
@@ -82,7 +111,10 @@ namespace DevourDev.Unity.TwoDThreeD
         internal int _index = -1;
 
 
-        internal void InitInternal(BillBoardSettings billBoardSettings, RelativeView[] viewsSettings, Transform rootTransform)
+        private TwoDThreeDView ActiveView => _linkedAnimator.ActiveView;
+
+
+        internal void InitInternal(BillBoardSettings billBoardSettings, TwoDThreeDView[] viewsSettings, Transform rootTransform)
         {
             _billBoardSettings = billBoardSettings;
             _viewsSettings = viewsSettings;
@@ -165,36 +197,42 @@ namespace DevourDev.Unity.TwoDThreeD
 
             for (int i = 0; i < _viewsSettings.Length; i++)
             {
-                _viewsSettings[i].Visual.SetActive(false);
+                _viewsSettings[i].gameObject.SetActive(false);
             }
 
             if (_viewsSettings.Length > 1)
                 UpdateRelativeView();
             else
-                SetActiveView(_viewsSettings[0].Visual);
+                SetActiveView(_viewsSettings[0]);
 
             _isDirty = false;
         }
 
-        private void SetActiveView(GameObject go)
+        private void SetActiveView(TwoDThreeDView view)
         {
-            if (_activeViewGo != null)
-                _activeViewGo.SetActive(false);
+            _linkedAnimator.SwitchView(view);
+            //if (_activeViewGo != null)
+            //{
+            //    _activeViewGo.SetActive(false);
+            //    view.Animator.Play(10, 10, 0.5f); // <- это мы используем
+            //}
 
-            if (go == null)
-            {
-                _activeViewGo = null;
-                _activeViewTr = null;
-                return;
-            }
+            //if (view == null)
+            //{
+            //    _activeViewGo = null;
+            //    _activeViewTr = null;
+            //    _activeView = null;
+            //    return;
+            //}
 
-            _activeViewGo = go;
-            _activeViewTr = go.transform;
-            go.SetActive(true);
+            //_activeViewGo = view.gameObject;
+            //_activeViewTr = _activeViewGo.transform;
+            //_activeViewGo.SetActive(true);
         }
 
         private void HandleSingletonInited(TwoDThreeDManager instance)
         {
+            TwoDThreeDManager.SingletonInited -= HandleSingletonInited;
             instance.Register(this);
         }
 
@@ -213,13 +251,13 @@ namespace DevourDev.Unity.TwoDThreeD
 
             //float minAngle = float.PositiveInfinity;
             float maxAngle = float.NegativeInfinity;
-            RelativeView closestView = null;
+            TwoDThreeDView closestView = null;
             var camRot = _camRot;
 
             for (int i = 0; i < len; i++)
             {
-                RelativeView sv = span[i];
-                float angle = Quaternion.Angle(camRot, sv.Direction.rotation);
+                TwoDThreeDView sv = span[i];
+                float angle = Quaternion.Angle(camRot, sv.LookFromDirection.rotation);
 
                 //if (angle < minAngle)
                 //{
@@ -234,16 +272,18 @@ namespace DevourDev.Unity.TwoDThreeD
                 }
             }
 
-            if (_activeViewGo != null && closestView.Visual.GetHashCode() == _activeViewGo.GetHashCode())
+            var activeView = ActiveView;
+
+            if (activeView != null && closestView.GetHashCode() == activeView.GetHashCode())
                 return;
 
-            SetActiveView(closestView.Visual);
+            SetActiveView(closestView);
         }
 
 
         private void AdjustBillboard()
         {
-            var tr = _activeViewTr;
+            var tr = ActiveView.Transform;
             tr.rotation = _billBoardSettings.MergeRotations(tr.rotation, _camRot);
         }
     }

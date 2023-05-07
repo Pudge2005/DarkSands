@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Cci;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -26,6 +27,7 @@ namespace DevourDev.Unity.TwoDThreeD
         [System.Serializable]
         private struct InitorSettings
         {
+            [SerializeField] private TwoDThreeDView _viewPrefab;
             [SerializeField] private Transform _viewsRoot;
             [SerializeField] private Transform _directionsRoot;
 
@@ -39,6 +41,7 @@ namespace DevourDev.Unity.TwoDThreeD
             [SerializeField] private SerializableNullable<uint> _initialViewsRenderingLayerMask;
 
 
+            public TwoDThreeDView ViewPrefab => _viewPrefab;
             public Transform ViewsRoot => _viewsRoot;
             public Transform DirectionsRoot => _directionsRoot;
 
@@ -140,6 +143,20 @@ namespace DevourDev.Unity.TwoDThreeD
             };
         }
 
+        internal static string GetStandartFromDirectionName(StandartDirections direction)
+        {
+            return direction switch
+            {
+                StandartDirections.Forward => "From forward",
+                StandartDirections.Back => "From back",
+                StandartDirections.Left => "From left",
+                StandartDirections.Right => "From right",
+                _ => throw new System.NotSupportedException($"name for direction {direction} is not " +
+                $"implemented or {nameof(direction)} argument has more than 1 direction")
+            };
+        }
+
+
         internal static Vector3 StandartDirectionToVector(StandartDirections direction)
         {
             return direction switch
@@ -177,27 +194,23 @@ namespace DevourDev.Unity.TwoDThreeD
             Transform directionsRoot)
         {
             var dirSprites = GetUniqueDirectionSprites();
-            bool shouldMirror = _settings.LeftIsMirroredRight;
 
             TwoDThreeDComponent.BillBoardSettings billBoardSettings = new(false, false, true);
-            var viewsSettings = new TwoDThreeDComponent.RelativeView[dirSprites.Count];
+            var viewsSettings = new TwoDThreeDView[dirSprites.Count];
 
             for (int i = 0; i < dirSprites.Count; i++)
             {
-                var dirSprite = dirSprites[i];
-                StandartDirections dir = dirSprite.Direction;
-                string dirName = GetStandartDirectionName(dir);
-                var viewSr = CreateView(dirName, viewsRoot);
+                var relView = CreateView(viewsRoot, dirSprites[i]);
 
-                if (shouldMirror && dir == StandartDirections.Left)
-                {
-                    viewSr.flipX = true;
-                }
+                //if (shouldMirror && dir == StandartDirections.Left)
+                //{
+                //    viewSr.flipX = true;
+                //}
 
-                viewSr.sprite = dirSprite.Sprite;
-                var dirTr = CreateDirectionTransform(dirName, directionsRoot, StandartDirectionToVector(dir));
+                //viewSr.sprite = dirSprite.Sprite;
+                //var dirTr = CreateDirectionTransform(dirName, directionsRoot, StandartDirectionToVector(dir));
 
-                viewsSettings[i] = new TwoDThreeDComponent.RelativeView(viewSr.gameObject, dirTr);
+                viewsSettings[i] = relView;
             }
 
             tdtd.InitInternal(billBoardSettings, viewsSettings, transform.root);
@@ -212,10 +225,15 @@ namespace DevourDev.Unity.TwoDThreeD
             return _settings.Views;
         }
 
-        private SpriteRenderer CreateView(string viewName, Transform root)
+
+        private TwoDThreeDView CreateView(Transform root, DirectionSprite directionSprite)
         {
-            var viewTr = CreateChildTransform(viewName, root);
+            StandartDirections dir = directionSprite.Direction;
+            string fromDirName = GetStandartFromDirectionName(dir);
+            var viewTr = CreateChildTransform(fromDirName, root);
             var go = viewTr.gameObject;
+
+#if RelativeViewUsesSpriteRenderer
             var sr = go.AddComponent<SpriteRenderer>();
             sr.drawMode = SpriteDrawMode.Simple;
             sr.spriteSortPoint = SpriteSortPoint.Pivot;
@@ -238,7 +256,16 @@ namespace DevourDev.Unity.TwoDThreeD
             var scale = viewTr.localScale;
             scale.x = -scale.x;
             viewTr.localScale = scale;
-            return sr;
+            sr.sprite = directionSprite.Sprite;
+#else
+            var renderer = go.AddComponent<MeshRenderer>();
+            //renderer.ma
+#endif
+
+
+            var dirTr = CreateDirectionTransform(fromDirName, root, StandartDirectionToVector(dir));
+            var relView = new TwoDThreeDView();
+            return relView;
         }
 
         private Transform CreateDirectionTransform(string name, Transform root, Vector3 relatedDirection)
@@ -342,7 +369,7 @@ namespace DevourDev.Unity.TwoDThreeD
         }
 #endif
 
-        private void Start()
+            private void Start()
         {
             Destroy(this);
         }
