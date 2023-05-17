@@ -22412,19 +22412,8 @@ MonoBehaviour:
     _viewPrefab: {fileID: 0}
     _viewsRoot: {fileID: 0}
     _directionsRoot: {fileID: 0}
-    _views: []
+    _directions: 
     _leftIsMirroredRight: 0
-    _initialViewsMaterial: {fileID: 0}
-    _initialViewsSortingLayer: 
-    _initialViewsSortingLayerId:
-      _value: 0
-      _hasValue: 0
-    _initialViewsOrderInLayer:
-      _value: 0
-      _hasValue: 0
-    _initialViewsRenderingLayerMask:
-      _value: 0
-      _hasValue: 0
   _init: 0
 --- !u!4 &1772537178
 Transform:
@@ -26016,7 +26005,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2060963240
 Transform:
   m_ObjectHideFlags: 0

@@ -49,6 +49,7 @@ GameObject:
   m_Component:
   - component: {fileID: 752597103605850009}
   - component: {fileID: 752597103605850008}
+  - component: {fileID: 667892865370370220}
   m_Layer: 0
   m_Name: 2D in 3D
   m_TagString: Untagged
@@ -85,24 +86,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e27a0c36388e2ea44ba1989902f250fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _linkedAnimator: {fileID: 667892865370370220}
+  _billBoardSettings:
+    LockXRot: 0
+    LockYRot: 0
+    LockZRot: 0
   _viewsSettings:
-  - _visual: {fileID: 752597105019502453}
-    _lookFromDirection: {fileID: 752597104422473279}
-  - _visual: {fileID: 752597104455903020}
-    _lookFromDirection: {fileID: 752597104419131267}
-  - _visual: {fileID: 752597105341026594}
-    _lookFromDirection: {fileID: 752597104824029590}
-  - _visual: {fileID: 752597103712154027}
-    _lookFromDirection: {fileID: 752597105139643530}
-  - _visual: {fileID: 752597104889356185}
-    _lookFromDirection: {fileID: 752597105210612036}
-  - _visual: {fileID: 752597104417318167}
-    _lookFromDirection: {fileID: 752597103774031931}
-  - _visual: {fileID: 752597105081338547}
-    _lookFromDirection: {fileID: 752597103747214974}
-  - _visual: {fileID: 752597105352137393}
-    _lookFromDirection: {fileID: 752597105340863814}
+  - {fileID: 1803249730937244405}
+  - {fileID: 2205035310810958378}
+  - {fileID: 1785708645097766787}
+  - {fileID: 7454464718235764532}
+  - {fileID: 2978095315670903335}
+  - {fileID: 5690503135480519999}
+  - {fileID: 3801258252184378384}
+  - {fileID: 565418214094162175}
   _rootTr: {fileID: 752597104301936018}
+--- !u!114 &667892865370370220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752597103605850010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9d5d12d0f72e544cbe018ccced4e18d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &752597103712154027
 GameObject:
   m_ObjectHideFlags: 0
@@ -113,13 +123,14 @@ GameObject:
   m_Component:
   - component: {fileID: 752597103712154026}
   - component: {fileID: 752597103712154025}
+  - component: {fileID: 7454464718235764532}
   m_Layer: 0
   m_Name: Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &752597103712154026
 Transform:
   m_ObjectHideFlags: 0
@@ -187,6 +198,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!114 &7454464718235764532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752597103712154027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3dd255a8b32364299d9eab6cc35b03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 0}
+  _lookFromDirection: {fileID: 752597105139643530}
+  _maxAngleToKeepView: 45
 --- !u!1 &752597103747214975
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,29 +361,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _settings:
+    _viewPrefab: {fileID: 0}
     _viewsRoot: {fileID: 0}
     _directionsRoot: {fileID: 0}
-    _views:
-    - Direction: 1
-      Sprite: {fileID: 21300000, guid: 6585af2d1a058fb4380d92349eb777ac, type: 3}
-    - Direction: 2
-      Sprite: {fileID: 21300000, guid: d51c96951206c854ba16625306e7bcb7, type: 3}
-    - Direction: 4
-      Sprite: {fileID: 21300000, guid: b9ce08d2d3782c643a4ec350052c52c2, type: 3}
-    - Direction: 8
-      Sprite: {fileID: 21300000, guid: ca0ffe46eb5675b418258b822a2ea5cb, type: 3}
+    _directions: 
     _leftIsMirroredRight: 0
-    _initialViewsMaterial: {fileID: 0}
-    _initialViewsSortingLayer: 
-    _initialViewsSortingLayerId:
-      _value: 0
-      _hasValue: 0
-    _initialViewsOrderInLayer:
-      _value: 0
-      _hasValue: 0
-    _initialViewsRenderingLayerMask:
-      _value: 0
-      _hasValue: 0
   _init: 0
 --- !u!1 &752597104417318167
 GameObject:
@@ -369,13 +377,14 @@ GameObject:
   m_Component:
   - component: {fileID: 752597104417318166}
   - component: {fileID: 752597104417318165}
+  - component: {fileID: 2978095315670903335}
   m_Layer: 0
   m_Name: Fwd_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &752597104417318166
 Transform:
   m_ObjectHideFlags: 0
@@ -443,6 +452,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!114 &2978095315670903335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752597104417318167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3dd255a8b32364299d9eab6cc35b03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 0}
+  _lookFromDirection: {fileID: 752597103774031931}
+  _maxAngleToKeepView: 45
 --- !u!1 &752597104419131268
 GameObject:
   m_ObjectHideFlags: 0
@@ -515,13 +539,14 @@ GameObject:
   m_Component:
   - component: {fileID: 752597104455903019}
   - component: {fileID: 752597104455903018}
+  - component: {fileID: 2205035310810958378}
   m_Layer: 0
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &752597104455903019
 Transform:
   m_ObjectHideFlags: 0
@@ -589,6 +614,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!114 &2205035310810958378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752597104455903020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3dd255a8b32364299d9eab6cc35b03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 0}
+  _lookFromDirection: {fileID: 752597104419131267}
+  _maxAngleToKeepView: 45
 --- !u!1 &752597104824029591
 GameObject:
   m_ObjectHideFlags: 0
@@ -630,13 +670,14 @@ GameObject:
   m_Component:
   - component: {fileID: 752597104889356184}
   - component: {fileID: 752597104889356183}
+  - component: {fileID: 5690503135480519999}
   m_Layer: 0
   m_Name: Fwd_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &752597104889356184
 Transform:
   m_ObjectHideFlags: 0
@@ -704,6 +745,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!114 &5690503135480519999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752597104889356185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3dd255a8b32364299d9eab6cc35b03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 0}
+  _lookFromDirection: {fileID: 752597105210612036}
+  _maxAngleToKeepView: 45
 --- !u!1 &752597105019502453
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,6 +770,7 @@ GameObject:
   m_Component:
   - component: {fileID: 752597105019502452}
   - component: {fileID: 752597105019502451}
+  - component: {fileID: 1803249730937244405}
   m_Layer: 0
   m_Name: Forward
   m_TagString: Untagged
@@ -788,6 +845,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!114 &1803249730937244405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752597105019502453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3dd255a8b32364299d9eab6cc35b03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 0}
+  _lookFromDirection: {fileID: 752597104422473279}
+  _maxAngleToKeepView: 45
 --- !u!1 &752597105081338547
 GameObject:
   m_ObjectHideFlags: 0
@@ -798,13 +870,14 @@ GameObject:
   m_Component:
   - component: {fileID: 752597105081338546}
   - component: {fileID: 752597105081338545}
+  - component: {fileID: 3801258252184378384}
   m_Layer: 0
   m_Name: Back_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &752597105081338546
 Transform:
   m_ObjectHideFlags: 0
@@ -872,6 +945,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!114 &3801258252184378384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752597105081338547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3dd255a8b32364299d9eab6cc35b03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 0}
+  _lookFromDirection: {fileID: 752597103747214974}
+  _maxAngleToKeepView: 45
 --- !u!1 &752597105139643531
 GameObject:
   m_ObjectHideFlags: 0
@@ -975,13 +1063,14 @@ GameObject:
   m_Component:
   - component: {fileID: 752597105341026593}
   - component: {fileID: 752597105341026592}
+  - component: {fileID: 1785708645097766787}
   m_Layer: 0
   m_Name: Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &752597105341026593
 Transform:
   m_ObjectHideFlags: 0
@@ -1049,6 +1138,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!114 &1785708645097766787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752597105341026594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3dd255a8b32364299d9eab6cc35b03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 0}
+  _lookFromDirection: {fileID: 752597104824029590}
+  _maxAngleToKeepView: 45
 --- !u!1 &752597105352137393
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,13 +1163,14 @@ GameObject:
   m_Component:
   - component: {fileID: 752597105352137392}
   - component: {fileID: 752597105352137391}
+  - component: {fileID: 565418214094162175}
   m_Layer: 0
   m_Name: Back_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &752597105352137392
 Transform:
   m_ObjectHideFlags: 0
@@ -1133,6 +1238,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!114 &565418214094162175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752597105352137393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3dd255a8b32364299d9eab6cc35b03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 0}
+  _lookFromDirection: {fileID: 752597105340863814}
+  _maxAngleToKeepView: 45
 --- !u!1001 &7877567918438583808
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,21 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
+using DevourDev.Utility;
 using UnityEngine;
 
-namespace Game
+namespace DarkSands.Global
 {
-    public class GlobalDatabases : MonoBehaviour
+    [DefaultExecutionOrder(-10000)]
+    public sealed class GlobalDatabases : Singleton<GlobalDatabases>
     {
-        // Start is called before the first frame update
-        void Start()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+        private static void InitializeSingleton()
         {
-        
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-        
+            InitializeSingletonBeforeSplashScreen();
         }
     }
 }

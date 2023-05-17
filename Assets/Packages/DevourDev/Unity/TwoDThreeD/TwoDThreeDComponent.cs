@@ -1,63 +1,8 @@
 using System;
-using System.ComponentModel;
 using UnityEngine;
 
 namespace DevourDev.Unity.TwoDThreeD
 {
-    public interface IAnimator
-    {
-        void SetFloat(int hash, float value);
-        void SetInt(int hash, int value);
-        void SetBool(int hash, bool value);
-        void SetTrigger(int hash);
-
-        float GetFloat(int hash);
-        int GetInt(int hash);
-        bool GetBool(int hash);
-    }
-
-    public static class AnimationHelpers
-    {
-        public static void SyncAnimators(Animator from, Animator to)
-        {
-            //Animation animation = null;
-            //animation.
-            int paramsCount = from.parameterCount;
-
-            for (int i = 0; i < paramsCount; i++)
-            {
-                var animParam = from.GetParameter(i);
-                SyncAnimParam(ref from, ref to, ref animParam);
-            }
-
-            var state = from.GetCurrentAnimatorStateInfo(0);
-            to.Play(state.fullPathHash, 0, state.normalizedTime);
-        }
-
-        private static void SyncAnimParam(ref Animator from, ref Animator to,
-                                   ref AnimatorControllerParameter animParam)
-        {
-            var hash = animParam.nameHash;
-            switch (animParam.type)
-            {
-                case AnimatorControllerParameterType.Float:
-                    to.SetFloat(hash, from.GetFloat(hash));
-                    break;
-                case AnimatorControllerParameterType.Int:
-                    to.SetInteger(hash, from.GetInteger(hash));
-                    break;
-                case AnimatorControllerParameterType.Bool:
-                    to.SetBool(hash, from.GetBool(hash));
-                    break;
-                case AnimatorControllerParameterType.Trigger:
-                    //to.SetTrigger(hash);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
     [DefaultExecutionOrder(TwoDThreeDManager.ExecutionOrder + 1)]
     public sealed class TwoDThreeDComponent : MonoBehaviour
     {
@@ -103,12 +48,11 @@ namespace DevourDev.Unity.TwoDThreeD
         [SerializeField] private TwoDThreeDView[] _viewsSettings;
         [SerializeField] private Transform _rootTr;
 
+        internal int _index = -1;
 
         private Quaternion _camRot;
         private Quaternion _prevRootRot;
         private bool _isDirty;
-
-        internal int _index = -1;
 
 
         private TwoDThreeDView ActiveView => _linkedAnimator.ActiveView;
@@ -197,7 +141,7 @@ namespace DevourDev.Unity.TwoDThreeD
 
             for (int i = 0; i < _viewsSettings.Length; i++)
             {
-                _viewsSettings[i].gameObject.SetActive(false);
+                _viewsSettings[i].GameObject.SetActive(false);
             }
 
             if (_viewsSettings.Length > 1)
@@ -238,6 +182,19 @@ namespace DevourDev.Unity.TwoDThreeD
 
         private void UpdateRelativeView()
         {
+            // Check if current view is not actual anymore.
+
+            var camRot = _camRot;
+            var activeView = ActiveView;
+
+            if(activeView != null)
+            {
+                var curViewAngle = Quaternion.Angle(camRot, activeView.LookFromDirection.rotation);
+
+                if (curViewAngle < activeView.MaxAngleToKeepView)
+                    return;
+            }
+
             var span = _viewsSettings.AsSpan();
             var len = span.Length;
 
@@ -252,12 +209,12 @@ namespace DevourDev.Unity.TwoDThreeD
             //float minAngle = float.PositiveInfinity;
             float maxAngle = float.NegativeInfinity;
             TwoDThreeDView closestView = null;
-            var camRot = _camRot;
 
             for (int i = 0; i < len; i++)
             {
                 TwoDThreeDView sv = span[i];
                 float angle = Quaternion.Angle(camRot, sv.LookFromDirection.rotation);
+
 
                 //if (angle < minAngle)
                 //{
@@ -271,8 +228,6 @@ namespace DevourDev.Unity.TwoDThreeD
                     closestView = sv;
                 }
             }
-
-            var activeView = ActiveView;
 
             if (activeView != null && closestView.GetHashCode() == activeView.GetHashCode())
                 return;

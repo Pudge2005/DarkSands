@@ -99,7 +99,7 @@ namespace DevourDev.Unity.TwoDThreeD
             var prevView = _activeView;
             _activeView = view;
 
-            if(_activeView != null)
+            if (_activeView != null)
             {
                 view.gameObject.SetActive(true);
             }
@@ -108,7 +108,10 @@ namespace DevourDev.Unity.TwoDThreeD
             {
                 if (view != null)
                 {
-                    AnimationHelpers.SyncAnimators(prevView.Animator, view.Animator);
+                    if (prevView.Animator != null)
+                    {
+                        AnimationHelpers.SyncAnimators(prevView.Animator, view.Animator);
+                    }
                 }
 
                 prevView.gameObject.SetActive(false);

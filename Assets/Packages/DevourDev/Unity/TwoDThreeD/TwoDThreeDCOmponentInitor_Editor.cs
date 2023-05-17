@@ -10,109 +10,82 @@ namespace DevourDev.Unity.TwoDThreeD
     {
 #if UNITY_EDITOR
         [System.Serializable]
-        internal  struct DirectionSprite
-        {
-            public  StandartDirections Direction;
-            public  Sprite Sprite;
-
-
-            public DirectionSprite(StandartDirections direction, Sprite sprite)
-            {
-                Direction = direction;
-                Sprite = sprite;
-            }
-        }
-
-
-        [System.Serializable]
         private struct InitorSettings
         {
             [SerializeField] private TwoDThreeDView _viewPrefab;
             [SerializeField] private Transform _viewsRoot;
             [SerializeField] private Transform _directionsRoot;
 
-            [SerializeField] private DirectionSprite[] _views;
+            [SerializeField] private StandardDirections[] _directions;
             [SerializeField] private bool _leftIsMirroredRight;
-
-            [SerializeField] private Material _initialViewsMaterial;
-            [SerializeField] private string _initialViewsSortingLayer;
-            [SerializeField] private SerializableNullable<int> _initialViewsSortingLayerId;
-            [SerializeField] private SerializableNullable<int> _initialViewsOrderInLayer;
-            [SerializeField] private SerializableNullable<uint> _initialViewsRenderingLayerMask;
 
 
             public TwoDThreeDView ViewPrefab => _viewPrefab;
             public Transform ViewsRoot => _viewsRoot;
             public Transform DirectionsRoot => _directionsRoot;
 
-            public IReadOnlyList<DirectionSprite> Views => _views;
+            public IReadOnlyList<StandardDirections> Directions => _directions;
             public bool LeftIsMirroredRight => _leftIsMirroredRight;
 
-            public Material InitialViewsMaterial => _initialViewsMaterial;
-            public string InitialViewsSortingLayerName => _initialViewsSortingLayer;
-            public int? InitialViewsSortingLayerId => SerializableNullable<int>.ToNullable(_initialViewsSortingLayerId);
-            public int? InitialViewsOrderInLayer => SerializableNullable<int>.ToNullable(_initialViewsOrderInLayer);
-            public uint? UnitialViewsRenderingLayerMask => SerializableNullable<uint>.ToNullable(_initialViewsRenderingLayerMask);
 
 
-
-            public StandartDirections GetDirectionsFlags()
+            public StandardDirections GetDirectionsFlags()
             {
-                var flags = StandartDirections.None;
+                var flags = StandardDirections.None;
 
-                foreach (var f in _views)
+                foreach (var dir in _directions)
                 {
-                    flags |= f.Direction;
+                    flags |= dir;
                 }
 
                 return flags;
             }
 
-            internal void EnsureViewsUniqueness()
+            internal void EnsureDirectionsUniqueness()
             {
-                var hs = HashSetPool<StandartDirections>.Get();
+                var hs = HashSetPool<StandardDirections>.Get();
 
-                var arr = _views;
+                var arr = _directions;
                 var len = arr.Length;
 
                 for (int i = 0; i < len; i++)
                 {
-                    if (!hs.Add(arr[i].Direction))
+                    if (!hs.Add(arr[i]))
                     {
-                        Debug.LogError($"Non-unique direction detected. Index: {i}, direction: {arr[i].Direction}");
+                        Debug.LogError($"Non-unique direction detected. Index: {i}, direction: {arr[i]}");
                         DeleteDuplicates(hs);
                         break;
                     }
                 }
 
-                HashSetPool<StandartDirections>.Release(hs);
+                HashSetPool<StandardDirections>.Release(hs);
             }
 
-            private void DeleteDuplicates(HashSet<StandartDirections> pooledHs)
+            private void DeleteDuplicates(HashSet<StandardDirections> pooledHs)
             {
-                var list = ListPool<DirectionSprite>.Get();
+                var list = ListPool<StandardDirections>.Get();
 
-                var arr = _views;
+                var arr = _directions;
                 var len = arr.Length;
 
                 for (int i = 0; i < len; i++)
                 {
                     var ds = arr[i];
-                    if (pooledHs.Add(ds.Direction))
+                    if (pooledHs.Add(ds))
                     {
                         list.Add(ds);
                     }
                 }
 
-                DirectionSprite[] views = list.ToArray();
-                ListPool<DirectionSprite>.Release(list);
-                _views = views;
+                StandardDirections[] views = list.ToArray();
+                ListPool<StandardDirections>.Release(list);
+                _directions = views;
             }
         }
 
 
         [Flags]
-        internal enum StandartDirections
+        internal enum StandardDirections
         {
             None = 0b0,
             Forward = 0b1,
@@ -130,41 +103,43 @@ namespace DevourDev.Unity.TwoDThreeD
         [SerializeField] private bool _init;
 
 
-        internal static string GetStandartDirectionName(StandartDirections direction)
+        internal static string GetStandardDirectionName(StandardDirections direction)
         {
             return direction switch
             {
-                StandartDirections.Forward => "Forward",
-                StandartDirections.Back => "Back",
-                StandartDirections.Left => "Left",
-                StandartDirections.Right => "Right",
+                StandardDirections.Forward => "Forward",
+                StandardDirections.Back => "Back",
+                StandardDirections.Left => "Left",
+                StandardDirections.Right => "Right",
                 _ => throw new System.NotSupportedException($"name for direction {direction} is not " +
                 $"implemented or {nameof(direction)} argument has more than 1 direction")
             };
         }
 
-        internal static string GetStandartFromDirectionName(StandartDirections direction)
+        internal static string GetStandardFromDirectionViewName(StandardDirections direction)
         {
-            return direction switch
+            var name = direction switch
             {
-                StandartDirections.Forward => "From forward",
-                StandartDirections.Back => "From back",
-                StandartDirections.Left => "From left",
-                StandartDirections.Right => "From right",
+                StandardDirections.Forward => "From forward",
+                StandardDirections.Back => "From back",
+                StandardDirections.Left => "From left",
+                StandardDirections.Right => "From right",
                 _ => throw new System.NotSupportedException($"name for direction {direction} is not " +
                 $"implemented or {nameof(direction)} argument has more than 1 direction")
             };
+
+            return name + " View";
         }
 
 
-        internal static Vector3 StandartDirectionToVector(StandartDirections direction)
+        internal static Vector3 StandardDirectionToVector(StandardDirections direction)
         {
             return direction switch
             {
-                StandartDirections.Forward => Vector3.forward,
-                StandartDirections.Back => Vector3.back,
-                StandartDirections.Left => Vector3.left,
-                StandartDirections.Right => Vector3.right,
+                StandardDirections.Forward => Vector3.forward,
+                StandardDirections.Back => Vector3.back,
+                StandardDirections.Left => Vector3.left,
+                StandardDirections.Right => Vector3.right,
                 _ => throw new System.NotSupportedException($"vector for direction {direction} is not " +
                 $"implemented or {nameof(direction)} argument has more than 1 direction")
             };
@@ -193,79 +168,101 @@ namespace DevourDev.Unity.TwoDThreeD
         private void InitDirectories(TwoDThreeDComponent tdtd, Transform viewsRoot,
             Transform directionsRoot)
         {
-            var dirSprites = GetUniqueDirectionSprites();
+            var directions = GetUniqueDirections();
 
             TwoDThreeDComponent.BillBoardSettings billBoardSettings = new(false, false, true);
-            var viewsSettings = new TwoDThreeDView[dirSprites.Count];
+            var views = new TwoDThreeDView[directions.Count];
 
-            for (int i = 0; i < dirSprites.Count; i++)
+            for (int i = 0; i < directions.Count; i++)
             {
-                var relView = CreateView(viewsRoot, dirSprites[i]);
-
-                //if (shouldMirror && dir == StandartDirections.Left)
-                //{
-                //    viewSr.flipX = true;
-                //}
-
-                //viewSr.sprite = dirSprite.Sprite;
-                //var dirTr = CreateDirectionTransform(dirName, directionsRoot, StandartDirectionToVector(dir));
-
-                viewsSettings[i] = relView;
+                var relView = CreateView(viewsRoot, directionsRoot, directions[i]);
+                views[i] = relView;
             }
 
-            tdtd.InitInternal(billBoardSettings, viewsSettings, transform.root);
+            InitMaxAngleToKeepViews(views);
+
+            foreach (var view in views)
+            {
+                UnityEditor.EditorUtility.SetDirty(view.gameObject);
+            }
+
+            tdtd.InitInternal(billBoardSettings, views, transform.root);
 
             // Probably overkill due to SetDirty(transform.root) in OnValidate().
             UnityEditor.EditorUtility.SetDirty(tdtd);
         }
 
-        private IReadOnlyList<DirectionSprite> GetUniqueDirectionSprites()
+        private void InitMaxAngleToKeepViews(TwoDThreeDView[] viewsSettings)
         {
-            _settings.EnsureViewsUniqueness();
-            return _settings.Views;
+            foreach (var vs in viewsSettings)
+            {
+                float minAngle = 180f;
+
+                foreach (var vs2 in viewsSettings)
+                {
+                    if (vs == vs2)
+                        continue;
+
+                    float angle = Quaternion.Angle(vs.LookFromDirection.rotation, vs2.LookFromDirection.rotation);
+
+                    if (angle < minAngle)
+                        minAngle = angle;
+                }
+
+                vs.MaxAngleToKeepView = minAngle;
+            }
+        }
+
+        private IReadOnlyList<StandardDirections> GetUniqueDirections()
+        {
+            _settings.EnsureDirectionsUniqueness();
+            return _settings.Directions;
         }
 
 
-        private TwoDThreeDView CreateView(Transform root, DirectionSprite directionSprite)
+        private TwoDThreeDView CreateView(Transform viewsRoot, Transform directionsRoot, StandardDirections dir)
         {
-            StandartDirections dir = directionSprite.Direction;
-            string fromDirName = GetStandartFromDirectionName(dir);
-            var viewTr = CreateChildTransform(fromDirName, root);
-            var go = viewTr.gameObject;
-
-#if RelativeViewUsesSpriteRenderer
-            var sr = go.AddComponent<SpriteRenderer>();
-            sr.drawMode = SpriteDrawMode.Simple;
-            sr.spriteSortPoint = SpriteSortPoint.Pivot;
-
-            if (TryGetSortingLayer(out int layerId))
-            {
-                sr.sortingLayerID = layerId;
-            }
-
-            if (TryGetRenderingLayerMask(out uint rlmask))
-            {
-                sr.renderingLayerMask = rlmask;
-            }
+            string viewName = GetStandardFromDirectionViewName(dir);
+            string dirName = GetStandardDirectionName(dir);
 
             // Sprite Renderers by default oriented to face backwards.
             // In 3D Space we need them to face forward. We can achieve
             // it by either flipping it or  rotating 180 degrees or
             // multiplying scale.x by -1. Flipping is cheap enough,
             // but manipulating scale 
-            var scale = viewTr.localScale;
-            scale.x = -scale.x;
-            viewTr.localScale = scale;
-            sr.sprite = directionSprite.Sprite;
-#else
-            var renderer = go.AddComponent<MeshRenderer>();
-            //renderer.ma
-#endif
 
+            //var scale = viewTr.localScale;
+            //scale.x = -scale.x;
+            //viewTr.localScale = scale;
+            //sr.sprite = dir.Sprite;
 
-            var dirTr = CreateDirectionTransform(fromDirName, root, StandartDirectionToVector(dir));
-            var relView = new TwoDThreeDView();
+            var dirTr = CreateDirectionTransform(dirName, directionsRoot, StandardDirectionToVector(dir));
+            var relView = GetViewInstance(viewName, viewsRoot);
+            relView.LookFromDirection = dirTr;
+
             return relView;
+        }
+
+        private TwoDThreeDView GetViewInstance(string gameObjectName, Transform parent)
+        {
+            if (_settings.ViewPrefab == null)
+                return CreateViewInstanceAuto(gameObjectName, parent);
+
+            var view = Instantiate(_settings.ViewPrefab, parent);
+            view.GameObject.name = gameObjectName;
+            return view;
+        }
+
+        private TwoDThreeDView CreateViewInstanceAuto(string gameObjectName, Transform parent)
+        {
+            var viewGo = new GameObject(gameObjectName);
+            var viewTr = viewGo.transform;
+            viewTr.SetParent(parent, false);
+            viewTr.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            var view = viewGo.AddComponent<TwoDThreeDView>();
+            view.Animator = viewGo.AddComponent<Animator>();
+            return view;
         }
 
         private Transform CreateDirectionTransform(string name, Transform root, Vector3 relatedDirection)
@@ -333,43 +330,9 @@ namespace DevourDev.Unity.TwoDThreeD
             tr.SetLocalPositionAndRotation(default, Quaternion.identity);
             return tr;
         }
-
-        private bool TryGetSortingLayer(out int layerIndex)
-        {
-            int? layerId = _settings.InitialViewsSortingLayerId;
-
-            if (layerId.HasValue)
-            {
-                layerIndex = layerId.Value;
-                return true;
-            }
-
-            if (!string.IsNullOrWhiteSpace(_settings.InitialViewsSortingLayerName))
-            {
-                layerIndex = SortingLayer.NameToID(_settings.InitialViewsSortingLayerName);
-                return layerIndex > 0;
-            }
-
-            layerIndex = -1;
-            return false;
-        }
-
-        private bool TryGetRenderingLayerMask(out uint rlmask)
-        {
-            uint? rlmaskRaw = _settings.UnitialViewsRenderingLayerMask;
-
-            if (rlmaskRaw.HasValue)
-            {
-                rlmask = rlmaskRaw.Value;
-                return true;
-            }
-
-            rlmask = default;
-            return false;
-        }
 #endif
 
-            private void Start()
+        private void Start()
         {
             Destroy(this);
         }
