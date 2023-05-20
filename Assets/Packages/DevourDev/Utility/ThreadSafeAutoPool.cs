@@ -1,15 +1,5 @@
-﻿using DevourDev.Ai;
-
-namespace DevourDev.Utility
+﻿namespace DevourDev.Utility
 {
-    public interface IAutoPoolableItem
-    {
-        void OnBeforeRent();
-
-        void OnReturn();
-
-        void OnPoolableItemDestroy();
-    }
     public class ThreadSafeAutoPool<T> : ThreadSafePool<T>
         where T : class, IAutoPoolableItem, new()
     {
@@ -29,7 +19,7 @@ namespace DevourDev.Utility
 
         protected sealed override void DestroyItem(T item)
         {
-            item.OnPoolableItemDestroy();
+            item?.OnPoolableItemDestroy();
         }
 
         protected sealed override void OnBeforeItemRented(T item)
@@ -39,7 +29,7 @@ namespace DevourDev.Utility
 
         protected sealed override void OnItemReturned(T returnedItem, bool willBeDestroyed)
         {
-            returnedItem.OnReturn();
+            returnedItem?.OnReturn();
         }
     }
 }

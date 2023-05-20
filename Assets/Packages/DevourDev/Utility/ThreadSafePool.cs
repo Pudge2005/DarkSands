@@ -6,7 +6,7 @@ namespace DevourDev.Utility
     {
         public const int DefaultBufferSize = 64;
 
-        private readonly object _lockObject;
+        private readonly object _lockObject = new();
 
         private readonly int _bufferSize;
         private readonly T[] _pool;
@@ -20,6 +20,11 @@ namespace DevourDev.Utility
 
         protected ThreadSafePool(int bufferSize)
         {
+            if(_bufferSize < 0)
+            {
+                throw new ArgumentException($"Buffer size can not be negative.", nameof(bufferSize));
+            }
+
             _bufferSize = bufferSize;
 
         }
